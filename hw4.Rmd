@@ -1,0 +1,149 @@
+---
+title: "p8130_hw4"
+output: github_document
+date: "2022-11-13"
+---
+
+```{r}
+library(tidyverse)
+library(BSDA)
+library(readxl)
+library(arsenal)
+library(knitr)
+```
+
+#Problem 1
+```{r}
+blood_data = c(125,123, 117, 123, 115, 112, 128 ,118, 124, 111, 116, 109 ,125,
+               120 ,113, 123, 112, 118, 121 ,118, 122, 115,
+               105, 118, 131)
+
+SIGN.test(blood_data, md=120,alternative = "less")
+
+wilcox.test(blood_data, mu = 120, alternative = "less")
+
+```
+
+#Problem 2
+
+##a)
+```{r}
+brain_data= read_excel("C:/Users/lenovo/Downloads/Brain.xlsx") %>%
+  janitor::clean_names() 
+
+
+non_human_reg= brain_data %>%
+  filter(species!="Homo sapiens") %>% 
+  lm(glia_neuron_ratio~ln_brain_mass,data= .)
+summary(non_human_reg)
+```
+
+##b)
+
+The relationship between glia-neuron ratio (denote as $GR$) and brain mass (denote as $BM$) is:
+  $$\widehat{GR}=0.16370+0.18113\times\ln(BM)$$
+  
+  the glia-neuron ratio of Homo sapiens should be:
+  
+  $$\widehat{GR}=0.16370+0.18113\times7.22=1.471$$
+  
+##c)
+  We find that the glia neuron ratio for human is 1.65, which is higher than other species. Therefore,
+the prediction interval interval for a single new observation is more appropriate since the value of
+glia neuron ratio for human can be considered as a new value. The predicted mean glia-
+  neuron ratio at the given brain mass can only capture information of the given data.
+
+##d)
+```{r}
+new_brain = brain_data %>% 
+  filter(species == "Homo sapiens")
+
+interval = as.tibble(
+  predict(non_human_reg, new_brain, interval="predict"),
+) %>% 
+  mutate(category = c("predict"))
+knitr::kable(interval)
+
+brain_data %>% 
+  filter(species!="Homo sapiens") %>% 
+  dplyr::select(glia_neuron_ratio) %>% 
+  summary()
+```
+
+the true value of human brain after log transformation falls in the prediction interval of non-human distribution, thus human brain do not have excessive glia-neuron ratio for its mass
+
+#e)
+As seen from the plot, we can see that the glia neuron ration for human exceeds other specie's ratio. 
+So the prediction of human from this model may not be appropriate enough.
+
+#Problem 3
+
+```{r}
+heart_data= read_csv("C:/Users/lenovo/Downloads/HeartDisease.csv")%>%
+  janitor::clean_names()
+
+```
+##a)
+```{r}
+stat_data =tableby( ~ totalcost + age + gender +
+                                  interventions + drugs+
+                                  e_rvisits+complications+
+                                  comorbidities+duration, 
+                                data  = heart_data,
+                                test  = FALSE, 
+                                total = FALSE,
+                                numeric.stats = c("meansd" ,"medianq1q3","range" ) )
+sum = summary(stat_data,text = TRUE)
+sum
+```
+In this dataset, the main outcome is `total cost`, . Other important covariate including the age and gender of the subscriber, number of complications that arouse during treatment, and duration of treatment condition. According to the plot above, The possible important predictors are likely to be `complications`, `drugs` and `ERvisits` and `interventions`.
+
+##b)
+```{r}
+heart_data %>% 
+  ggplot(aes(totalcost))+
+  geom_histogram()+
+  labs(x = "Total cost",
+       title = "Plot 1  Distribution of total cost")
+
+heart_log = 
+  heart_data %>% 
+  mutate(log_totalcost = log(totalcost))
+
+plot =
+  heart_log %>% 
+  ggplot(aes(log_totalcost))+
+  geom_histogram()+
+  labs(x = "Total cost")
+plot
+```
+
+##c)
+```{r}
+heart_new = 
+  heart_log %>% 
+  mutate(comp_bin = 
+           case_when(
+             complications == 0 ~ "0",
+             complications != 0 ~ "1"))
+
+```
+
+##d)
+```{r}
+heart_new %>% 
+  mutate(log_totalcost = log(totalcost)) %>% 
+  ggplot(aes(y = log_totalcost, x = e_rvisits))+
+  geom_point()+
+  labs(x = "e_rvisits",
+       y = "log(total cost)",
+       title = "Scatter plot of log(total cost) and e_rvisits")
+
+heart_new_data= 
+  heart_new %>% 
+  filter(log_totalcost >= 0 )
+
+fit = lm(log_totalcost ~ e_rvisits,heart_new_data)
+summary(fit)
+
+```
