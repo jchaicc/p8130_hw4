@@ -23,6 +23,10 @@ SIGN.test(blood_data, md=120,alternative = "less")
 wilcox.test(blood_data, mu = 120, alternative = "less")
 
 ```
+From the Sign test, the test statistic is 10, the p-value is 0.276, which is greater than 0.05. Therefore,
+we do not have significant evidence to reject the null hypothesis, there is no evidence that the blood sugar readings is less than 120.
+
+From the Wilcoxon signed-rank test, the test statistic is 112.5, the p-value is 0.1447, which is greater than 0.05. Therefore, there is no significant evidence that the blood sugar level is less than 120.
 
 # Problem 2
 
