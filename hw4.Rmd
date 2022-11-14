@@ -85,7 +85,6 @@ So the prediction of human from this model may not be appropriate enough.
 ```{r}
 heart_data= read_csv("C:/Users/lenovo/Downloads/HeartDisease.csv")%>%
   janitor::clean_names()
-
 ```
 ## a)
 ```{r}
@@ -100,7 +99,7 @@ stat_data =tableby( ~ totalcost + age + gender +
 sum = summary(stat_data,text = TRUE)
 sum
 ```
-In this dataset, the main outcome is `total cost`, . Other important covariate including the age and gender of the subscriber, number of complications that arouse during treatment, and duration of treatment condition. According to the plot above, The possible important predictors are likely to be `complications`, `drugs` and `ERvisits` and `interventions`.
+In this dataset, the main outcome is `total cost`. Other important covariate includes the age and gender, number of complications that happens during treatment, and duration of treatment condition.From the plot above, the possible important predictors are likely to be `complications`, `drugs` and `ERvisits` and `interventions`.
 
 ## b)
 ```{r}
@@ -151,3 +150,50 @@ fit = lm(log_totalcost ~ e_rvisits,heart_new_data)
 summary(fit)
 
 ```
+
+We can see that the p-value is extremely low, so we reject the null hypothesis that there isn't a linear relationship between total cost and number of emergency visits. The intercept represents the expected value of (total cost + 1) after log transformation, in which case number of emergency visits equals to 0; The slope means that when one visit increases, the estimated value of (total cost + 1) after log transformation will increase 0.22529 on average. Based on the regression results, the $R^2$ of this model is only 0.098, which is quite small, illustrating poor performance on predicting.
+
+## e)
+
+
+```{r}
+heart_new[is.na(heart_new) | heart_new=="-Inf"] = NA
+multi_reg <- lm(log_totalcost~e_rvisits+comp_bin,data = heart_new)
+
+summary(multi_reg)
+```
+
+## i)
+
+```{r}
+lm(log_totalcost~factor(comp_bin)+e_rvisits+factor(comp_bin)*e_rvisits,data = heart_new) %>%
+ summary()
+
+lm(log_totalcost~factor(comp_bin)*e_rvisits,data = heart_new) %>% 
+  summary()
+
+heart_new %>% 
+    ggplot(aes(x = e_rvisits, y = totalcost,color = comp_bin))+
+    geom_point(alpha = 0.3)+
+    geom_smooth(method = "lm",se = F)
+```
+
+From the plot we can see that the slope of e_rvisits change quite bit for different comp_bin, there might be an interaction between e_rvisits and comp_bin. From the above summary, the model with the term "comp_bin*e_rvisits", we fail to reject the null hypothesis that the coefficient of comp_bin*e_rvisits is 0, therefore, the interaction effect is not significant. So the comp_bin is not a modifier.
+
+## ii)
+
+When adding comp_bin into the model, the coefficient of e_rvisits decrease from 0.22672 to 0.2046, it decreases about 10% , so binary complication variable is a counfounder of association between number of emergency visits and total cost.
+
+## iii)
+
+```{r}
+anova(multi_reg)
+
+```
+
+Total cost of comp_bin is significantly different. As a confounder,
+should be considered when finding the relationship between e_rvisits and total cost.
+
+
+
+
