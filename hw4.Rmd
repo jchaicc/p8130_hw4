@@ -1,6 +1,6 @@
 ---
 title: "p8130_hw4"
-output: word_document
+output: pdf_document
 date: "2022-11-13"
 ---
 
@@ -10,6 +10,12 @@ library(BSDA)
 library(readxl)
 library(arsenal)
 library(knitr)
+```
+
+```{r,include = F}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE)
 ```
 
 # Problem 1
@@ -151,7 +157,21 @@ summary(fit)
 
 ```
 
-We can see that the p-value is extremely low, so we reject the null hypothesis that there isn't a linear relationship between total cost and number of emergency visits. The intercept represents the expected value of (total cost + 1) after log transformation, in which case number of emergency visits equals to 0; The slope means that when one visit increases, the estimated value of (total cost + 1) after log transformation will increase 0.22529 on average. Based on the regression results, the $R^2$ of this model is only 0.098, which is quite small, illustrating poor performance on predicting.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+We can see that the p-value is extremely low, so we reject the null hypothesis that there isn't a linear relationship between total cost and number of emergency visits. The intercept represents the expected value of (total cost) after log transformation, in which case number of emergency visits equals to 0; The slope means that when one visit increases, the estimated value of (total cost) after log transformation will increase 0.22529 on average. Based on the regression results, the $R^2$ of this model is only 0.098, which is quite small, illustrating poor performance on predicting.
 
 ## e)
 
@@ -189,6 +209,11 @@ When adding comp_bin into the model, the coefficient of e_rvisits decrease from 
 ```{r}
 anova(multi_reg)
 
+```
+
+
+```{r}
+anova(fit,multi_reg)
 ```
 
 Total cost of comp_bin is significantly different. As a confounder,
