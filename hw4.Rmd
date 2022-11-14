@@ -177,8 +177,8 @@ We can see that the p-value is extremely low, so we reject the null hypothesis t
 
 
 ```{r}
-heart_new[is.na(heart_new) | heart_new=="-Inf"] = NA
-multi_reg <- lm(log_totalcost~e_rvisits+comp_bin,data = heart_new)
+heart_new_data[is.na(heart_new_data) | heart_new_data=="-Inf"] = NA
+multi_reg <- lm(log_totalcost~e_rvisits+comp_bin,data = heart_new_data)
 
 summary(multi_reg)
 ```
@@ -186,10 +186,10 @@ summary(multi_reg)
 ## i)
 
 ```{r}
-lm(log_totalcost~factor(comp_bin)+e_rvisits+factor(comp_bin)*e_rvisits,data = heart_new) %>%
+lm(log_totalcost~factor(comp_bin)+e_rvisits+factor(comp_bin)*e_rvisits,data = heart_new_data) %>%
  summary()
 
-lm(log_totalcost~factor(comp_bin)*e_rvisits,data = heart_new) %>% 
+lm(log_totalcost~factor(comp_bin)*e_rvisits,data = heart_new_data) %>% 
   summary()
 
 heart_new %>% 
