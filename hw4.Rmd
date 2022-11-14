@@ -1,6 +1,6 @@
 ---
 title: "p8130_hw4"
-output: pdf_document
+output: word_document
 date: "2022-11-13"
 ---
 
